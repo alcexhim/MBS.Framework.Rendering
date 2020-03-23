@@ -8,6 +8,8 @@
     <RootNamespace>MBS.Framework.Rendering</RootNamespace>
     <AssemblyName>MBS.Framework.Rendering</AssemblyName>
     <ReleaseVersion>4.0.2019.12</ReleaseVersion>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\Production.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -63,21 +65,21 @@
       <Project>{00266B21-35C9-4A7F-A6BA-D54D7FDCC25C}</Project>
       <Name>MBS.Framework</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\UniversalEditor\CSharp\Libraries\UniversalEditor.Core\UniversalEditor.Core.csproj">
+    <ProjectReference Include="..\..\..\UniversalEditor\Libraries\UniversalEditor.Core\UniversalEditor.Core.csproj">
       <Project>{2D4737E6-6D95-408A-90DB-8DFF38147E85}</Project>
       <Name>UniversalEditor.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\UniversalEditor\CSharp\Plugins\UniversalEditor.Plugins.Multimedia3D\UniversalEditor.Plugins.Multimedia3D.csproj">
-      <Project>{4FD9DB1D-76AA-48D1-8446-95376C4A2BC2}</Project>
-      <Name>UniversalEditor.Plugins.Multimedia3D</Name>
+    <ProjectReference Include="..\..\..\UniversalEditor\Libraries\UniversalEditor.Essential\UniversalEditor.Essential.csproj">
+      <Project>{30467E5C-05BC-4856-AADC-13906EF4CADD}</Project>
+      <Name>UniversalEditor.Essential</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\UniversalEditor\CSharp\Plugins\UniversalEditor.Plugins.Multimedia\UniversalEditor.Plugins.Multimedia.csproj">
+    <ProjectReference Include="..\..\..\UniversalEditor\Plugins\UniversalEditor.Plugins.Multimedia\UniversalEditor.Plugins.Multimedia.csproj">
       <Project>{BE4D0BA3-0888-42A5-9C09-FC308A4509D2}</Project>
       <Name>UniversalEditor.Plugins.Multimedia</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\UniversalEditor\CSharp\Libraries\UniversalEditor.Essential\UniversalEditor.Essential.csproj">
-      <Project>{30467E5C-05BC-4856-AADC-13906EF4CADD}</Project>
-      <Name>UniversalEditor.Essential</Name>
+    <ProjectReference Include="..\..\..\UniversalEditor\Plugins\UniversalEditor.Plugins.Multimedia3D\UniversalEditor.Plugins.Multimedia3D.csproj">
+      <Project>{4FD9DB1D-76AA-48D1-8446-95376C4A2BC2}</Project>
+      <Name>UniversalEditor.Plugins.Multimedia3D</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

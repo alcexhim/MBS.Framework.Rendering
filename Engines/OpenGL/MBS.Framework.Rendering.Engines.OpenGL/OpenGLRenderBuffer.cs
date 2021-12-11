@@ -62,6 +62,21 @@ namespace MBS.Framework.Rendering.Engines.OpenGL
 			}
 			Internal.OpenGL.Methods.glErrorToException();
 		}
+		protected override void SetSubDataInternal<T>(int offset, T[] data)
+		{
+			int size = data.Length * Marshal.SizeOf(typeof(T));
+
+			GCHandle ptr = GCHandle.Alloc(data, GCHandleType.Pinned);
+			try
+			{
+				Internal.OpenGL.Methods.glBufferSubData(OpenGLEngine.BufferTargetToGLBufferTarget(_target), offset, size, ptr.AddrOfPinnedObject());
+			}
+			finally
+			{
+				ptr.Free();
+			}
+			Internal.OpenGL.Methods.glErrorToException();
+		}
 		protected override void SetVertexAttributeInternal(uint index, int count, ElementType type, bool normalized, int stride, uint offset)
 		{
 			Internal.OpenGL.Methods.glEnableVertexAttribArray(index);

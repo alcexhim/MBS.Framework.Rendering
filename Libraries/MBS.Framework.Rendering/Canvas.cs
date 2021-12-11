@@ -516,6 +516,8 @@ namespace MBS.Framework.Rendering
 			mvarOpsBegun--;
 		}
 
+		protected 
+
 		private Dictionary<PictureObjectModel, Texture> _texturesByPicture = new Dictionary<PictureObjectModel, Texture>();
 		private Dictionary<string, Texture> _texturesByFileName = new Dictionary<string, Texture>();
 		private Dictionary<uint, Texture> _texturesByID = new Dictionary<uint, Texture>();
@@ -559,6 +561,105 @@ namespace MBS.Framework.Rendering
 				_texturesByFileName.Add(FileName, texture);
 			}
 			return texture;
+		}
+
+		private Dictionary<char, CharacterGlyph> _charGlyphs = new Dictionary<char, CharacterGlyph>();
+		protected void RegisterCharacterGlyph(char ch, CharacterGlyph glyph)
+		{
+			_charGlyphs[ch] = glyph;
+		}
+
+		protected abstract void InitializeCharacterGlyphsInternal(string text);
+		public void InitializeCharacterGlyphs(string text)
+		{
+			InitializeCharacterGlyphsInternal(text);
+		}
+
+		public CharacterGlyph GetCharacterGlyph(char ch)
+		{
+			return _charGlyphs[ch];
+		}
+		public bool IsCharacterGlyphInitialized(char ch)
+		{
+			return _charGlyphs.ContainsKey(ch);
+		}
+
+		private VertexArray hVAO = null;
+		private RenderBuffer hVBO = null;
+		private Texture textureText = null;
+
+		private ShaderProgram spText = null;
+		protected void DrawText(string text, Vector2D position, Color color, double scale = 1.0)
+		{
+			InitializeCharacterGlyphs(text);
+
+			hVAO = Engine.CreateVertexArray(); // glGenVertexArrays(1, &VAO);
+			hVBO = Engine.CreateBuffer(); // glGenBuffers(1, &VBO);
+
+			hVAO.Bind(); // glBindVertexArray(VAO);
+			hVBO.Bind(BufferTarget.ArrayBuffer); // glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+			hVBO.SetData<float>(new float[6 * 4], BufferDataUsage.DynamicDraw); // glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+
+			hVAO.Enable(); //  glEnableVertexAttribArray(0);
+			hVAO.SetVertexAttributePointer<float>(4, false, 4 * 4 /*sizeof(float)*/, null);  // glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+			hVBO.Unbind(); // glBindBuffer(BufferTarget.ArrayBuffer, 0);
+			hVAO.Unbind();
+
+
+			if (spText == null)
+			{
+				// initialize text shader
+				spText = Engine.CreateShaderProgram();
+				spText.Shaders.Add(Engine.CreateShaderFromResource(ShaderType.Vertex, typeof(Engine), "MBS.Framework.Rendering.ShaderPrograms.Text.Text.glv"));
+				spText.Shaders.Add(Engine.CreateShaderFromResource(ShaderType.Fragment, typeof(Engine), "MBS.Framework.Rendering.ShaderPrograms.Text.Text.glf"));
+			}
+
+			// activate corresponding render state
+			spText.Use();
+
+			spText.SetUniform("textColor", color.R, color.G, color.B);
+			Texture = textureText; // glActiveTexture(GL_TEXTURE0);
+			hVAO.Bind(); // glBindVertexArray(VAO);
+
+			double x = position.X;
+			// iterate through all characters
+			for (int i = 0; i < text.Length; i++)
+			{
+				CharacterGlyph ch = GetCharacterGlyph(text[i]);
+
+				double xpos = position.X + ch.Bearing.X * scale;
+				double ypos = position.Y - (ch.Size.Height - ch.Bearing.Y) * scale;
+
+				double w = ch.Size.Width * scale;
+				double h = ch.Size.Height * scale;
+				// update VBO for each character
+				double[][] vertices /*[6][4]*/ =
+				{
+					new double[] { xpos,     ypos + h,   0.0, 0.0 },
+					new double[] { xpos,     ypos,       0.0, 1.0 },
+					new double[] { xpos + w, ypos,       1.0, 1.0 },
+
+					new double[] { xpos,     ypos + h,   0.0, 0.0 },
+					new double[] { xpos + w, ypos,       1.0, 1.0 },
+					new double[] { xpos + w, ypos + h,   1.0, 0.0 }
+				};
+				// render glyph texture over quad
+				Texture = _texturesByID[ch.TextureID]; // glBindTexture(GL_TEXTURE_2D, ch.textureID);
+
+				// update content of VBO memory
+				hVBO.Bind(BufferTarget.ArrayBuffer); // glBindBuffer(GL_ARRAY_BUFFER, VBO);
+				hVBO.SetSubData<double[]>(0, vertices); // glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+				hVBO.Unbind(); // glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+				// render quad
+				DrawArrays(RenderMode.Triangles, 0, 6); // glDrawArrays(GL_TRIANGLES, 0, 6);
+				// now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+				x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
+			}
+
+			hVAO.Unbind(); // glBindVertexArray(0);
+			Texture = null; // glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
 	}

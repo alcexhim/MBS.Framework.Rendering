@@ -353,6 +353,8 @@ namespace MBS.Framework.Rendering.Engines.OpenGL.Internal.OpenGL.Windows
 		[DllImport(LIBRARY_OPENGL)]
 		public static extern void glUniform3f(int location, float v0, float v1, float v2);
 		[DllImport(LIBRARY_OPENGL)]
+		public static extern void glUniform3d(int location, double v0, double v1, double v2);
+		[DllImport(LIBRARY_OPENGL)]
 		public static extern void glUniformMatrix2fv(int location, int count, bool transpose, float[] value);
 		[DllImport(LIBRARY_OPENGL)]
 		public static extern void glUniformMatrix3fv(int location, int count, bool transpose, float[] value);

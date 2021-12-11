@@ -70,6 +70,10 @@ namespace MBS.Framework.Rendering
 		{
 			Engine.SetProgramUniform(this, name, v0, v1, v2);
 		}
+		public void SetUniform(string name, double v0, double v1, double v2)
+		{
+			Engine.SetProgramUniform(this, name, v0, v1, v2);
+		}
 
 		public void SetUniformMatrix(string name, int count, bool transpose, float[] value)
 		{

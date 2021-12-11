@@ -3508,6 +3508,26 @@ namespace MBS.Framework.Rendering.Engines.OpenGL.Internal.OpenGL
 			}
 			throw new PlatformNotSupportedException();
 		}
+		public static void glUniform3d(int location, double v0, double v1, double v2)
+		{
+			switch (Environment.OSVersion.Platform)
+			{
+			case PlatformID.MacOSX:
+				break;
+			case PlatformID.Unix:
+				Linux.Methods.glUniform3d(location, v0, v1, v2);
+				return;
+			case PlatformID.Win32NT:
+			case PlatformID.Win32S:
+			case PlatformID.Win32Windows:
+			case PlatformID.WinCE:
+				Windows.Methods.glUniform3d(location, v0, v1, v2);
+				return;
+			case PlatformID.Xbox:
+				break;
+			}
+			throw new PlatformNotSupportedException();
+		}
 		public static void glUniformMatrix2fv(int location, int count, bool transpose, float[] value)
 		{
 			switch (Environment.OSVersion.Platform)

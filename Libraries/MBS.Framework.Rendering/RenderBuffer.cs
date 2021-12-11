@@ -21,7 +21,7 @@
 using System;
 namespace MBS.Framework.Rendering
 {
-	public abstract class RenderBuffer : IDisposable
+	public abstract class RenderBuffer : System.IDisposable
 	{
 		protected abstract void BindInternal(BufferTarget target);
 		public void Bind(BufferTarget target)
@@ -43,6 +43,11 @@ namespace MBS.Framework.Rendering
 		public void SetData<T>(T[] data, BufferDataUsage usage)
 		{
 			SetDataInternal<T>(data, usage);
+		}
+		protected abstract void SetSubDataInternal<T>(int offset, T[] data);
+		public void SetSubData<T>(int offset, T[] data)
+		{
+			SetSubDataInternal<T>(offset, data);
 		}
 
 		protected abstract void SetVertexAttributeInternal(uint index, int count, ElementType type, bool normalized, int stride, uint offset);

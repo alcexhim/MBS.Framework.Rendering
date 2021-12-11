@@ -21,7 +21,7 @@
 using System;
 namespace MBS.Framework.Rendering
 {
-	public class Shader : IDisposable
+	public class Shader : System.IDisposable
 	{
 		public class ShaderCollection
 			: System.Collections.ObjectModel.Collection<Shader>

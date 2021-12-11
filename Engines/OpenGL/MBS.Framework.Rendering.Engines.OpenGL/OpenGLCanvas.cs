@@ -19,6 +19,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Collections.Generic;
 using MBS.Framework.Drawing;
 using MBS.Framework.Rendering.Engines.OpenGL.Internal.OpenGL;
 
@@ -26,7 +27,6 @@ namespace MBS.Framework.Rendering.Engines.OpenGL
 {
 	public class OpenGLCanvas : Canvas
 	{
-		public Engine Engine { get; private set; } = null;
 		protected internal OpenGLCanvas(Engine engine)
 			: base(engine)
 		{
@@ -92,10 +92,12 @@ namespace MBS.Framework.Rendering.Engines.OpenGL
 		protected override void BeginInternal(RenderMode mode)
 		{
 			Internal.OpenGL.Methods.glBegin((int)mode);
+			Internal.OpenGL.Methods.glErrorToException();
 		}
 		protected override void EndInternal()
 		{
 			Internal.OpenGL.Methods.glEnd();
+			Internal.OpenGL.Methods.glErrorToException();
 		}
 
 		protected override void SetMaterialParameterInternal(FaceName face, MaterialParameterName parm, float[] value)
@@ -246,6 +248,76 @@ namespace MBS.Framework.Rendering.Engines.OpenGL
 		{
 			Internal.OpenGL.Methods.glDrawArrays(OpenGLEngine.RenderModeToGLRenderMode(mode), start, count);
 			Internal.OpenGL.Methods.glErrorToException();
+		}
+
+		// private Dictionary<Font, IntPtr> hFaces = new Dictionary<Font, IntPtr>();
+		private IntPtr hFace = IntPtr.Zero;
+		private IntPtr hFT = IntPtr.Zero;
+
+		protected override void InitializeCharacterGlyphsInternal(string text/*, Font font*/)
+		{
+			if (hFT == IntPtr.Zero)
+			{
+				Internal.FreeType.Constants.FT_Error err = Internal.FreeType.Methods.FT_Init_FreeType(ref hFT);
+				Internal.FreeType.Methods.FT_Error_To_Exception(err);
+			}
+
+			if (hFace == IntPtr.Zero)
+			{
+				Internal.FreeType.Methods.FT_New_Face(hFT, "", 0, ref hFace);
+			}
+
+			for (int i = 0; i < text.Length; i++)
+			{
+				if (IsCharacterGlyphInitialized(text[i]))
+					continue;
+
+				// load character glyph
+
+				Internal.FreeType.Constants.FT_Error err = Internal.FreeType.Methods.FT_Load_Char(hFace, text[i], Internal.FreeType.Constants.FT_Load_Flags.Render);
+				Internal.FreeType.Methods.FT_Error_To_Exception(err);
+				/*
+				{
+					Console.Error.WriteLine("warning: opengl: freetype: failed to load glyph for char {0}", text[i]);
+					continue;
+				}
+				*/
+
+				// generate texture
+				uint texture = Engine.GenerateTextureID();
+				Engine.BindTexture(TextureTarget.Texture2D, texture); // glBindTexture(GL_TEXTURE_2D, texture);
+
+				Engine.SetTextureImage(TextureTarget.Texture2D, 0, TextureFormat.Red, 0 /*hFace.glyph.bitmap.width*/, 0 /*hFace.glyph.bitmap.rows*/, 0, TextureFormat.Red, ElementType.UnsignedByte, null /*hFace.glyph.bitmap.buffer*/);
+				/*
+				glTexImage2D(
+					GL_TEXTURE_2D,
+					0,
+					GL_RED,
+					face->glyph->bitmap.width,
+					face->glyph->bitmap.rows,
+					0,
+					GL_RED,
+					GL_UNSIGNED_BYTE,
+					face->glyph->bitmap.buffer
+				);
+				*/
+
+				// set texture options
+				Engine.SetTextureParameter(TextureParameterTarget.Texture2D, TextureParameterName.TextureWrapS, TextureWrap.ClampToEdge);
+				Engine.SetTextureParameter(TextureParameterTarget.Texture2D, TextureParameterName.TextureWrapT, TextureWrap.ClampToEdge);
+				Engine.SetTextureParameter(TextureParameterTarget.Texture2D, TextureParameterName.MinimumFilter, TextureFilter.Linear); // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				Engine.SetTextureParameter(TextureParameterTarget.Texture2D, TextureParameterName.MaximumFilter, TextureFilter.Linear); // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+				// now store character for later use
+				CharacterGlyph character = new CharacterGlyph()
+				{
+					TextureID = texture,
+					Size = new Dimension2D(0, 0), // hFace.glyph.bitmap.width, hFace.glyph.bitmap.rows),
+					Bearing = new Vector2D(0, 0), // hFace.glyph.bitmap_left, hFace.glyph.bitmap_top),
+					Advance = 0 // hFace.glyph.advance.x
+				};
+				RegisterCharacterGlyph(text[i], character);
+			}
 		}
 	}
 }

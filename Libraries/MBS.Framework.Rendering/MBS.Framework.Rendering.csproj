@@ -59,6 +59,8 @@
     <Compile Include="ElementType.cs" />
     <Compile Include="VertexArray.cs" />
     <Compile Include="RenderBuffer.cs" />
+    <Compile Include="CharacterGlyph.cs" />
+    <Compile Include="TextureFormat.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\MBS.Framework\MBS.Framework\MBS.Framework.csproj">
@@ -81,6 +83,14 @@
       <Project>{4FD9DB1D-76AA-48D1-8446-95376C4A2BC2}</Project>
       <Name>UniversalEditor.Plugins.Multimedia3D</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ShaderPrograms\" />
+    <Folder Include="ShaderPrograms\Text\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ShaderPrograms\Text\Text.glf" />
+    <EmbeddedResource Include="ShaderPrograms\Text\Text.glv" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

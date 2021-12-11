@@ -40,5 +40,21 @@ namespace MBS.Framework.Rendering.Engines.OpenGL
 			Internal.OpenGL.Methods.glBindVertexArray(0);
 			Internal.OpenGL.Methods.glErrorToException();
 		}
+		protected override void EnableInternal()
+		{
+			Internal.OpenGL.Methods.glEnableVertexAttribArray(Handle);
+			Internal.OpenGL.Methods.glErrorToException();
+		}
+		protected override void SetVertexAttributePointerInternal(int size, ElementType type, bool normalized, int stride, object pointer)
+		{
+			if (pointer is float[])
+			{
+				Internal.OpenGL.Methods.glVertexAttribPointer(Handle, size, OpenGLEngine.ElementTypeToGLElementType(type), normalized, stride, (float[])pointer);
+			}
+			else
+			{
+				throw new ArgumentException("pointer type not supported - must be float[]", nameof(pointer));
+			}
+		}
 	}
 }

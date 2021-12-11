@@ -21,13 +21,13 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using MBS.Framework.Drawing;
 using MBS.Framework.Rendering.Engines.OpenGL.Internal.OpenGL;
 
 namespace MBS.Framework.Rendering.Engines.OpenGL
 {
 	public class OpenGLEngine : Engine
 	{
-
 		protected override Canvas CreateCanvasInternal()
 		{
 			return new OpenGLCanvas(this);
@@ -253,11 +253,41 @@ namespace MBS.Framework.Rendering.Engines.OpenGL
 			Internal.OpenGL.Methods.glUniform3f(Internal.OpenGL.Methods.glGetUniformLocation(_ProgramHandles[program], name), value1, value2, value3);
 			Internal.OpenGL.Methods.glErrorToException();
 		}
+		protected override void SetProgramUniformInternal(ShaderProgram program, string name, double value1, double value2, double value3)
+		{
+			Internal.OpenGL.Methods.glUniform3d(Internal.OpenGL.Methods.glGetUniformLocation(_ProgramHandles[program], name), value1, value2, value3);
+			Internal.OpenGL.Methods.glErrorToException();
+		}
 		protected override void SetProgramUniformMatrixInternal(ShaderProgram program, string name, int count, bool transpose, float[] value)
 		{
 			int loc = Internal.OpenGL.Methods.glGetUniformLocation(_ProgramHandles[program], name);
 			Internal.OpenGL.Methods.glUniformMatrix4fv(loc, count, transpose, value);
 			Internal.OpenGL.Methods.glErrorToException();
+		}
+
+		protected override float TranslateValueInternal(TextureWrap value)
+		{
+			switch (value)
+			{
+				case TextureWrap.Clamp: return Constants.GL_CLAMP;
+				case TextureWrap.ClampToEdge: return Constants.GL_CLAMP_TO_EDGE;
+				case TextureWrap.MirroredRepeat: return Constants.GL_MIRRORED_REPEAT;
+				case TextureWrap.Repeat: return Constants.GL_REPEAT;
+			}
+			throw new ArgumentOutOfRangeException(nameof(value), String.Format("value {0} not found in {1} enum", value, nameof(TextureWrap)));
+		}
+		protected override float TranslateValueInternal(TextureFilter value)
+		{
+			switch (value)
+			{
+				case TextureFilter.Linear: return Constants.GL_LINEAR;
+				case TextureFilter.LinearMipmapLinear: return Constants.GL_LINEAR_MIPMAP_LINEAR;
+				case TextureFilter.LinearMipmapNearest: return Constants.GL_LINEAR_MIPMAP_NEAREST;
+				case TextureFilter.Nearest: return Constants.GL_NEAREST;
+				case TextureFilter.NearestMipmapLinear: return Constants.GL_NEAREST_MIPMAP_LINEAR;
+				case TextureFilter.NearestMipmapNearest: return Constants.GL_NEAREST_MIPMAP_NEAREST;
+			}
+			throw new ArgumentOutOfRangeException(nameof(value), String.Format("value {0} not found in {1} enum", value, nameof(TextureFilter)));
 		}
 
 		protected override uint GetProgramAttributeLocationInternal(ShaderProgram program, string name)
@@ -333,7 +363,7 @@ namespace MBS.Framework.Rendering.Engines.OpenGL
 			_ShaderHandles.Remove(shader);
 		}
 
-		protected override VertexArray[] CreateVertexArrayInternal(int count)
+		protected override VertexArray[] CreateVertexArraysInternal(int count)
 		{
 			uint[] arrays = new uint[count];
 			Internal.OpenGL.Methods.glGenVertexArrays(count, arrays);
@@ -346,7 +376,7 @@ namespace MBS.Framework.Rendering.Engines.OpenGL
 			}
 			return list.ToArray();
 		}
-		protected override void DeleteVertexArrayInternal(VertexArray[] arrays)
+		protected override void DeleteVertexArraysInternal(VertexArray[] arrays)
 		{
 			uint[] handles = new uint[arrays.Length];
 			for (int i = 0; i < arrays.Length; i++)

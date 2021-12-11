@@ -96,15 +96,23 @@ namespace MBS.Framework.Rendering
 		}
 		protected abstract void SetProgramUniformInternal(ShaderProgram program, string name, float value1, float value2);
 
-		protected abstract VertexArray[] CreateVertexArrayInternal(int count);
-		public VertexArray[] CreateVertexArray(int count)
+		protected abstract VertexArray[] CreateVertexArraysInternal(int count);
+		public VertexArray[] CreateVertexArrays(int count)
 		{
-			return CreateVertexArrayInternal(count);
+			return CreateVertexArraysInternal(count);
 		}
-		protected abstract void DeleteVertexArrayInternal(VertexArray[] arrays);
-		public void DeleteVertexArray(VertexArray[] arrays)
+		public VertexArray CreateVertexArray()
 		{
-			DeleteVertexArrayInternal(arrays);
+			return CreateVertexArrays(1)[0];
+		}
+		protected abstract void DeleteVertexArraysInternal(VertexArray[] arrays);
+		public void DeleteVertexArrays(VertexArray[] arrays)
+		{
+			DeleteVertexArraysInternal(arrays);
+		}
+		public void DeleteVertexArray(VertexArray array)
+		{
+			DeleteVertexArrays(new VertexArray[] { array });
 		}
 
 		internal void SetProgramUniform(ShaderProgram program, string name, float value1, float value2)
@@ -113,6 +121,11 @@ namespace MBS.Framework.Rendering
 		}
 		protected abstract void SetProgramUniformInternal(ShaderProgram program, string name, float value1, float value2, float value3);
 		internal void SetProgramUniform(ShaderProgram program, string name, float value1, float value2, float value3)
+		{
+			SetProgramUniformInternal(program, name, value1, value2, value3);
+		}
+		protected abstract void SetProgramUniformInternal(ShaderProgram program, string name, double value1, double value2, double value3);
+		internal void SetProgramUniform(ShaderProgram program, string name, double value1, double value2, double value3)
 		{
 			SetProgramUniformInternal(program, name, value1, value2, value3);
 		}
@@ -147,6 +160,28 @@ namespace MBS.Framework.Rendering
 		{
 			SetTextureParameterInternal(target, name, value);
 		}
+		public void SetTextureParameter(TextureParameterTarget target, TextureParameterName name, TextureWrap value)
+		{
+			float value_f = TranslateValue(value);
+			SetTextureParameterInternal(target, name, value_f);
+		}
+		public void SetTextureParameter(TextureParameterTarget target, TextureParameterName name, TextureFilter value)
+		{
+			float value_f = TranslateValue(value);
+			SetTextureParameterInternal(target, name, value_f);
+		}
+
+		protected abstract float TranslateValueInternal(TextureWrap value);
+		private float TranslateValue(TextureWrap value)
+		{
+			return TranslateValueInternal(value);
+		}
+		protected abstract float TranslateValueInternal(TextureFilter value);
+		private float TranslateValue(TextureFilter value)
+		{
+			return TranslateValueInternal(value);
+		}
+
 		public void SetTextureParameter(TextureParameterTarget target, TextureParameterName name, int value)
 		{
 			SetTextureParameter(target, name, (float)value);
@@ -179,6 +214,10 @@ namespace MBS.Framework.Rendering
 		{
 			return GenerateTextureIDsInternal(count);
 		}
+		public uint GenerateTextureID()
+		{
+			return GenerateTextureIDs(1)[0];
+		}
 
 		protected abstract void UseProgramInternal(ShaderProgram program);
 		internal void UseProgram(ShaderProgram program)
@@ -192,7 +231,13 @@ namespace MBS.Framework.Rendering
 			CreateShaderInternal(shader);
 		}
 
-
+		public Shader CreateShaderFromResource(ShaderType type, Type resourceType, string resourceName)
+		{
+			System.IO.Stream st = resourceType.Assembly.GetManifestResourceStream(resourceName);
+			System.IO.StreamReader sr = new System.IO.StreamReader(st);
+			string text = sr.ReadToEnd();
+			return CreateShaderFromString(type, text);
+		}
 		public Shader CreateShaderFromString(ShaderType type, string code)
 		{
 			Shader shader = new Shader(this, type);
@@ -213,6 +258,21 @@ namespace MBS.Framework.Rendering
 			FlushInternal();
 		}
 
-
+		/// <summary>
+		/// Sets the two-dimensional texture image.
+		/// </summary>
+		/// <param name="target">Specifies the target texture.</param>
+		/// <param name="level">Specifies the level-of-detail number.  Level 0 is the base image level. Level n is the nth mipmap reduction image. If target is GL_TEXTURE_RECTANGLE or GL_PROXY_TEXTURE_RECTANGLE, level must be 0.</param>
+		/// <param name="internalFormat">Specifies the number of color components in the texture. Must be one of base internal formats given in Table 1, one of the sized internal formats given in Table 2, or one of the compressed internal formats given in Table 3, below.</param>
+		/// <param name="width">Specifies the width of the texture image. All implementations support texture images that are at least 1024 texels wide.</param>
+		/// <param name="height">Specifies the height of the texture image, or the number of layers in a texture array, in the case of the GL_TEXTURE_1D_ARRAY and GL_PROXY_TEXTURE_1D_ARRAY targets. All implementations support 2D texture images that are at least 1024 texels high, and texture arrays that are at least 256 layers deep.</param>
+		/// <param name="border">This value must be 0.</param>
+		/// <param name="format">Specifies the format of the pixel data. The following symbolic values are accepted: GL_RED, GL_RG, GL_RGB, GL_BGR, GL_RGBA, GL_BGRA, GL_RED_INTEGER, GL_RG_INTEGER, GL_RGB_INTEGER, GL_BGR_INTEGER, GL_RGBA_INTEGER, GL_BGRA_INTEGER, GL_STENCIL_INDEX, GL_DEPTH_COMPONENT, GL_DEPTH_STENCIL.</param>
+		/// <param name="type">Specifies the data type of the pixel data. The following symbolic values are accepted: GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_HALF_FLOAT, GL_FLOAT, GL_UNSIGNED_BYTE_3_3_2, GL_UNSIGNED_BYTE_2_3_3_REV, GL_UNSIGNED_SHORT_5_6_5, GL_UNSIGNED_SHORT_5_6_5_REV, GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_4_4_4_4_REV, GL_UNSIGNED_SHORT_5_5_5_1, GL_UNSIGNED_SHORT_1_5_5_5_REV, GL_UNSIGNED_INT_8_8_8_8, GL_UNSIGNED_INT_8_8_8_8_REV, GL_UNSIGNED_INT_10_10_10_2, and GL_UNSIGNED_INT_2_10_10_10_REV.</param>
+		/// <param name="data">Specifies a pointer to the image data in memory.</param>
+		public void SetTextureImage(TextureTarget target, int level, TextureFormat internalFormat, int width, int height, int border, TextureFormat format, ElementType type, byte[] data)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

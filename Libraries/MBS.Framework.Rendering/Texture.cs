@@ -126,7 +126,10 @@ namespace MBS.Framework.Rendering
 
 				if (!System.IO.File.Exists(mvarFileName)) return;
 
-				PictureObjectModel pic = UniversalEditor.Common.Reflection.GetAvailableObjectModel<PictureObjectModel>(new UniversalEditor.Accessors.FileAccessor(mvarFileName));
+				if (!UniversalEditor.Common.Reflection.GetAvailableObjectModel<PictureObjectModel>(new UniversalEditor.Accessors.FileAccessor(mvarFileName), out PictureObjectModel pic))
+				{
+					return;
+				}
 				if (pic == null) return;
 
 				TextureImage = pic;

@@ -9,6 +9,7 @@ namespace MBS.Framework.Rendering
     {
         Clamp,
         ClampToEdge,
+		MirroredRepeat,
         Repeat
     }
 }

@@ -1,4 +1,4 @@
-﻿//
+//
 //  OpenGLEngine.cs
 //
 //  Author:
@@ -333,7 +333,7 @@ namespace MBS.Framework.Rendering.Engines.OpenGL
 			_ShaderHandles.Remove(shader);
 		}
 
-		protected override VertexArray[] CreateVertexArrayInternal(int count)
+		protected override VertexArray[] CreateVertexArraysInternal(int count)
 		{
 			uint[] arrays = new uint[count];
 			Internal.OpenGL.Methods.glGenVertexArrays(count, arrays);
@@ -346,7 +346,7 @@ namespace MBS.Framework.Rendering.Engines.OpenGL
 			}
 			return list.ToArray();
 		}
-		protected override void DeleteVertexArrayInternal(VertexArray[] arrays)
+		protected override void DeleteVertexArraysInternal(VertexArray[] arrays)
 		{
 			uint[] handles = new uint[arrays.Length];
 			for (int i = 0; i < arrays.Length; i++)

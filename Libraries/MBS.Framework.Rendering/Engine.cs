@@ -1,4 +1,4 @@
-﻿//
+//
 //  Engine.cs
 //
 //  Author:
@@ -96,15 +96,23 @@ namespace MBS.Framework.Rendering
 		}
 		protected abstract void SetProgramUniformInternal(ShaderProgram program, string name, float value1, float value2);
 
-		protected abstract VertexArray[] CreateVertexArrayInternal(int count);
-		public VertexArray[] CreateVertexArray(int count)
+		protected abstract VertexArray[] CreateVertexArraysInternal(int count);
+		public VertexArray[] CreateVertexArrays(int count)
 		{
-			return CreateVertexArrayInternal(count);
+			return CreateVertexArraysInternal(count);
 		}
-		protected abstract void DeleteVertexArrayInternal(VertexArray[] arrays);
-		public void DeleteVertexArray(VertexArray[] arrays)
+		public VertexArray CreateVertexArray()
 		{
-			DeleteVertexArrayInternal(arrays);
+			return CreateVertexArraysInternal(1)[0];
+		}
+		protected abstract void DeleteVertexArraysInternal(VertexArray[] arrays);
+		public void DeleteVertexArrays(VertexArray[] arrays)
+		{
+			DeleteVertexArraysInternal(arrays);
+		}
+		public void DeleteVertexArray(VertexArray array)
+		{
+			DeleteVertexArraysInternal(new VertexArray[] { array });
 		}
 
 		internal void SetProgramUniform(ShaderProgram program, string name, float value1, float value2)

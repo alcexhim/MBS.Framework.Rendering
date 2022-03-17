@@ -1,4 +1,4 @@
-﻿//
+//
 //  OpenGLEngine.cs
 //
 //  Author:

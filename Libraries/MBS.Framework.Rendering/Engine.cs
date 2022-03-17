@@ -1,4 +1,4 @@
-﻿//
+//
 //  Engine.cs
 //
 //  Author:

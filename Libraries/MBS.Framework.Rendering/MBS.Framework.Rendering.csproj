@@ -7,9 +7,10 @@
     <OutputType>Library</OutputType>
     <RootNamespace>MBS.Framework.Rendering</RootNamespace>
     <AssemblyName>MBS.Framework.Rendering</AssemblyName>
-    <ReleaseVersion>4.0.2019.12</ReleaseVersion>
+    <ReleaseVersion>4.0.2022.03</ReleaseVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Production.snk</AssemblyOriginatorKeyFile>
+    <SynchReleaseVersion>false</SynchReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

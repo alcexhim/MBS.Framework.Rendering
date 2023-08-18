@@ -2,9 +2,9 @@
 //  TextureFormat.cs
 //
 //  Author:
-//       beckermj <>
+//       Michael Becker <alcexhim@gmail.com>
 //
-//  Copyright (c) 2023 ${CopyrightHolder}
+//  Copyright (c) 2021 Mike Becker's Software
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,6 +23,20 @@ namespace MBS.Framework.Rendering
 {
 	public enum TextureFormat
 	{
-Red
+		Red,
+		RedGreen,
+		RedGreenBlue,
+		BlueGreenRed,
+	 	RedGreenBlueAlpha,
+ 		BlueGreenRedAlpha,
+		RedInteger,
+		RedGreenInteger,
+		RedGreenBlueInteger,
+		BlueGreenRedInteger,
+		RedGreenBlueAlphaInteger,
+		BlueGreenRedAlphaInteger,
+		StencilIndex,
+		DepthComponent,
+		DepthStencil
 	}
 }

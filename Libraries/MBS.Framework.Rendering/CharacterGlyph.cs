@@ -2,9 +2,9 @@
 //  CharacterGlyph.cs
 //
 //  Author:
-//       beckermj <>
+//       Michael Becker <alcexhim@gmail.com>
 //
-//  Copyright (c) 2023 ${CopyrightHolder}
+//  Copyright (c) 2021 Mike Becker's Software
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,11 +23,11 @@ using MBS.Framework.Drawing;
 
 namespace MBS.Framework.Rendering
 {
-	public class CharacterGlyph
+	public struct CharacterGlyph
 	{
-		public Vector2D Bearing { get; set; }
-		public Dimension2D Size { get; set; }
-		public uint TextureID { get; set; }
-		public uint Advance { get; set; }
+		public uint TextureID;  // ID handle of the glyph texture
+		public Dimension2D Size;       // Size of glyph
+		public Vector2D Bearing;    // Offset from baseline to left/top of glyph
+		public uint Advance;    // Offset to advance to next glyph
 	}
 }
